@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Maze</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    
+    <canvas id="mainCanvas"></canvas>
+
+    <!-- // Menu + Init Screen //-->
+
+    <div id="menu">
+
+        <div id="container">
+            <h1 id="title">MindMap</h1>
+            <h2 id="name">This experience covers very real and intense topics.</h2>
+            
+            
+            <p id="about">  
+                <b>Controls</b><br>
+            Use <b>WASD</b> to move, use <b>F</b> to crouch and the <b>MOUSE</b> to look around<br>
+            If you get stuck hit <b>R</b> to return back to the start<br>
+            <br>
+            This experience is made to digitalise my personal recurring dreams,<br>
+            they all relate to my mental health journey and thus can be quite difficult to see<br>
+            <br>
+            Pressing <b>ESC</b> will pause the experience and cover the sceen like this,<br>as well as give the cursor back.<br>
+            Please close this tab if you are at all uncomfortable.</p>
+        </div>
+    </div>
+
+    <!-- // Mobile Support //-->
+    
+    <div id="mobileSupport">
+        <h1>Sorry,<br>
+            mobile devices are not
+            <br>currently supported.<br>
+            To view the experience<br>
+            please use a desktop<br>
+            or laptop computer,<br>
+            With a mouse and keyboard.</h1>
+    </div>
+
+    <div id="helpDiv">
+        <h4 id="helpText">Click anywhere to start</h4>
+    </div>
+
+    <!-- // Loading Sceen //-->
+
+    <div id="loadingScreen">
+        <div id="loadingHolder">
+            <img src="images/loading.gif">
+            <p id="loadingText">Loading</p>
+        </div>
+        
+    </div>
+
+    <div id="cursorContainer">
+        <img id="cursor" src="images/cursor.svg">
+    </div>
+
+    <script type="text/javascript" src="js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="js/babylon.js"></script>
+    <script type="text/javascript" src="js/babylonjs.loaders.min.js"></script>
+    <script type="text/javascript" src="js/babylon.gui.min.js"></script>
+    <script type="text/javascript" src="js/script.js"></script>
+
+</body>
+</html>
