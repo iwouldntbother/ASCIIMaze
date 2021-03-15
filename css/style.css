@@ -5,9 +5,140 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+/* MOBILE WARNING */
+
+#mobileSupport {
+    width: 100vw;
+    height: 100vh;
+    z-index: 100000000000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+}
+
+#mobileSupport h1 {
+    font-size: 2vh;
+}
+
+/* LOADING SCREEN */
+
+#loadingScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000000000;
+    display: grid;
+    text-align: center;
+    background-color: white;
+    
+}
+
+#loadingHolder {
+    align-self: center;
+    justify-self: center;
+}
+
+#loadingHolder img {
+    height: 50vh;
+    width: auto;
+}
+
+#loadingHolder p {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 3vh;
+    text-transform: uppercase;
+    font-weight: bolder;
+    margin-top: -5vh;
+}
+
+/* MENU */
+
+#menu {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    font-size: 5vh;
+    text-align: center;
+    pointer-events: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    /* background-color: #262626; */
+}
+
+#container{
+    padding-left: 2vw;
+    padding-right: 2vw;
+    text-align: center;
+    background-color: white;
+    font-size: medium;
+    pointer-events: all;
+    border-radius: 25px;
+    max-height: 90vh;
+    max-width: 50vw;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+h1, h2{
+    text-transform: uppercase;
+}
+
+#name {
+    max-width: 40vw;
+}
+
+#helpDiv {
+    position: absolute;
+    bottom: 0vh;
+    text-align: center;
+    width: 100%;
+    pointer-events: none;
+    z-index: 6;
+}
+
+#helpText {
+    position: relative;
+    color: white;
+}
+
 /* CANVAS */
 
 #mainCanvas {
     width: 100vw;
     height: 100vh;
+}
+
+/* CURSOR */
+
+#cursorContainer {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+#cursor {
+    position: absolute;
+    width: 1vw;
+    height: 1vw;
 }

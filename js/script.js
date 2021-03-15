@@ -39,6 +39,12 @@
     var pickedUp;
     var pickedUpCameraDiff = new BABYLON.Vector3();
 
+    var whiteMat = new BABYLON.StandardMaterial("whiteMat", scene)
+    whiteMat.emissiveColor = new BABYLON.Color3.White();
+
+    var redMat = new BABYLON.StandardMaterial("redMat", scene)
+    redMat.emissiveColor = new BABYLON.Color3.Red();
+
     function init(){
 
     console.log("Started loading")
@@ -81,6 +87,7 @@
 
     var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 1), scene);
     light1.intensity = 1;
+    light1.specular = new BABYLON.Color3(0,0,0);
     camera = new BABYLON.UniversalCamera("FreeCamera", new BABYLON.Vector3(0,12,0), scene);
     camera.speed = 4;
     camera.inertia = 0.7;
@@ -92,12 +99,15 @@
     camera._needMoveForGravity = true;
     camera.minZ = 0.01;
     
-
+    var postProcess = new BABYLON.AsciiArtPostProcess("AsciiArt", camera, {
+        font: "0.75vw Monospace",
+        characterSet: " -+@/'#"
+    });
 
     scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
     scene.shadowsEnabled = true;
     camera.applyGravity = true;
-    camera.ellipsoid = new BABYLON.Vector3(0.5,5,0.5);
+    camera.ellipsoid = new BABYLON.Vector3(0.5,6,0.5);
     scene.collisionsEnabled = true;
     camera.checkCollisions = true;
     camera.rotationQuaternion = new BABYLON.Quaternion();
@@ -108,12 +118,15 @@
     // var gl = new BABYLON.GlowLayer("glow", scene);
     // gl.intensity = 0.5;
     
-    var whiteMat = new BABYLON.StandardMaterial("whiteMat", scene)
-    whiteMat.emissiveColor = new BABYLON.Color3.White();
+    
     // whiteMat.specularColor = new BABYLON.Color3.White();
 
-    var redMat = new BABYLON.StandardMaterial("redMat", scene)
-    redMat.emissiveColor = new BABYLON.Color3.Red();
+    
+
+    // var ground = new BABYLON.MeshBuilder.CreateGround("ground", {width: 500, height: 500}, scene);
+    // ground.checkCollisions = true;
+    // ground.material = redMat
+
 
     // galleryMesh = BABYLON.SceneLoader.ImportMesh("", "models/", "MindMapTwo.glb", scene, function(meshes){
 
@@ -375,3 +388,143 @@
     }
 
 
+    // MAZE //
+
+    let wallHeight = 50;
+    let wallThickness = 2;
+    let wallWidth = 20;
+    var grid = [];
+
+    function maze(x,y) {
+        var n=x*y-1;
+        if (n<0) {alert("illegal maze dimensions");return;}
+        var horiz =[]; for (var j= 0; j<x+1; j++) horiz[j]= [],
+            verti =[]; for (var j= 0; j<x+1; j++) verti[j]= [],
+            here = [Math.floor(Math.random()*x), Math.floor(Math.random()*y)],
+            path = [here],
+            unvisited = [];
+        for (var j = 0; j<x+2; j++) {
+            unvisited[j] = [];
+            for (var k= 0; k<y+1; k++)
+                unvisited[j].push(j>0 && j<x+1 && k>0 && (j != here[0]+1 || k != here[1]+1));
+        }
+        while (0<n) {
+            var potential = [[here[0]+1, here[1]], [here[0],here[1]+1],
+                [here[0]-1, here[1]], [here[0],here[1]-1]];
+            var neighbors = [];
+            for (var j = 0; j < 4; j++)
+                if (unvisited[potential[j][0]+1][potential[j][1]+1])
+                    neighbors.push(potential[j]);
+            if (neighbors.length) {
+                n = n-1;
+                next= neighbors[Math.floor(Math.random()*neighbors.length)];
+                unvisited[next[0]+1][next[1]+1]= false;
+                if (next[0] == here[0]) {
+                    horiz[next[0]][(next[1]+here[1]-1)/2]= true;
+                } else { 
+                    verti[(next[0]+here[0]-1)/2][next[1]]= true;
+                }
+                path.push(here = next);
+            } else 
+                here = path.pop();
+        }
+        return {x: x, y: y, horiz: horiz, verti: verti};
+    }
+
+    function displayMaze(m) {
+        var text= [];
+        for (var j= 0; j<m.x*2+1; j++) {
+            var line= [];
+            if (0 == j%2)
+                for (var k=0; k<m.y*4+1; k++)
+                    if (0 == k%4) 
+                        line[k]= '+';
+                    else
+                        if (j>0 && m.verti[j/2-1][Math.floor(k/4)])
+                            line[k]= ' ';
+                        else
+                            line[k]= '-';
+            else
+                for (var k=0; k<m.y*4+1; k++)
+                    if (0 == k%4)
+                        if (k>0 && m.horiz[(j-1)/2][k/4-1])
+                            line[k]= '#';
+                        else
+                            line[k]= '|';
+                    else
+                        line[k]= ' ';
+            if (0 == j) line[1]= line[2]= line[3]= ' ';
+            if (m.x*2-1 == j) line[4*m.y]= ' ';
+            text.push(line.join('')+'\r\n');
+        }
+        buildMazeText(text);
+        return text.reverse().join('');
+    }
+
+    function buildMazeText(text) {
+        for (var i=0; i<text.length; i++) {
+            if (0 == i%2) {
+                var temp = text[i].split("+")
+                temp.splice(0, 1)
+                temp.splice(temp.length-1, 1)
+
+                for (var h=0; h<temp.length; h++) {
+                    if (temp[h] == "---") {
+                        insertVertiWall(h*wallWidth, (i/2)*wallWidth);
+                    }
+                }
+            } else {
+               var temp = text[i].replace(/\s/g, "").split("")
+                for (var v=0; v<temp.length; v++) {
+                    if (temp[v] == "|") {
+                        insertHorizWall(v*wallWidth, (i/2)*wallWidth)
+                    }
+                }
+            }
+        }
+
+        var mazeGroundSize = Math.floor(text[0].length/4) * wallWidth
+        var mazeGround = new BABYLON.MeshBuilder.CreateGround("MazeGround", {height: mazeGroundSize, width: mazeGroundSize}, scene)
+        mazeGround.material = whiteMat;
+        mazeGround.checkCollisions = true;
+        mazeGround.position.x = ((Math.floor(text[0].length/4) * wallWidth) / 2) - (wallWidth/2)
+        mazeGround.position.z = ((Math.floor(text[0].length/4) - 1) * wallWidth) / 2
+
+        var endGround = new BABYLON.MeshBuilder.CreateGround("EndGround", {height: wallWidth, width: wallWidth}, scene)
+        endGround.material = redMat;
+        endGround.checkCollisions = true;
+        endGround.position.x = Math.floor(text[0].length/4) * wallWidth
+        endGround.position.z = (Math.floor(text[0].length/4) - 1) * wallWidth
+    }
+
+    function insertVertiWall(x, y) {
+        let wall = new BABYLON.MeshBuilder.CreateBox("wall", {width: wallWidth, height: wallHeight, depth: wallThickness}, scene);
+        wall.material = whiteMat
+        wall.renderOutline = true;
+        wall.outlineWidth = 0.25;
+        wall.outlineColor = BABYLON.Color3.Black();
+        wall.position.x = x
+        wall.position.z = y - (wallWidth/2)
+        wall.checkCollisions = true;
+    }
+
+    function insertHorizWall(x, y) {
+        let wall = new BABYLON.MeshBuilder.CreateBox("wall", {width: wallThickness, height: wallHeight, depth: wallWidth}, scene);
+        wall.material = redMat
+        wall.renderOutline = true;
+        wall.outlineWidth = 0.25;
+        wall.outlineColor = BABYLON.Color3.Black();
+        wall.position.x = x - (wallWidth/2)
+        wall.position.z = y - (wallWidth/2)
+        wall.checkCollisions = true;
+    }
+
+    function buildMaze(m) {
+
+        console.log(displayMaze(m))
+
+        return m
+    
+    }
+
+    buildMaze(maze(10,10))
