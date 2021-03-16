@@ -142,3 +142,37 @@ h1, h2{
     width: 1vw;
     height: 1vw;
 }
+
+/* MINI MAP */
+
+#miniMapContainer {
+    pointer-events: none;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+#miniMap {
+    background: #FFF;
+    float: right;
+    padding: 1vw;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    border-radius: 1vw 0vw 0vw 0vw;
+}
+
+#mapText {
+    font-family: monospace;
+    font-weight: 800;
+    margin: 0;
+    font-size: 0.75vw;
+}
+
+#copyright {
+    font-size: 0.8vw;
+    margin: 0;
+}

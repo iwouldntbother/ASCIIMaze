@@ -10,8 +10,6 @@
     var engine = new BABYLON.Engine(canvas, false, {doNotHandleContextLos: true});
     var camera;
     engine.enableOfflineSupport = false;
-    var available = ['-dxt.ktx'];
-    // engine.setTextureFormatToUse(available);
 
 
     // Mesh Loading Variables //
@@ -45,33 +43,17 @@
     var redMat = new BABYLON.StandardMaterial("redMat", scene)
     redMat.emissiveColor = new BABYLON.Color3.Red();
 
+    var blackMat = new BABYLON.StandardMaterial("blackMat", scene)
+    blackMat.emissiveColor = new BABYLON.Color3.Black();
+
+    var brickMat = new BABYLON.StandardMaterial("BrickMat", scene)
+    brickMat.emissiveTexture = new BABYLON.Texture("images/BrickTexWhite.png")
+    brickMat.emissiveTexture.uScale = 0.5;
+
     function init(){
 
     console.log("Started loading")
     scene = new BABYLON.Scene(engine);
-
-    var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("myUI");
-
-    fpsText = new BABYLON.GUI.TextBlock();
-    fpsText.text = "0 fps";
-    fpsText.color = "white";
-    fpsText.fontSize = 16;
-    fpsText.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
-    fpsText.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
-    fpsText.paddingTop = "10px";
-    fpsText.paddingRight = "10px";
-
-    advancedTexture.addControl(fpsText);
-
-    var versionText = new BABYLON.GUI.TextBlock();
-    versionText.text = version;
-    versionText.color = "white"
-    versionText.fontSize = 12;
-    versionText.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
-    versionText.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
-    versionText.paddingRight = "10px";
-
-    advancedTexture.addControl(versionText);
 
     var options = new BABYLON.SceneOptimizerOptions(30, 2000);
 
@@ -83,11 +65,6 @@
 
     var optimizer = new BABYLON.SceneOptimizer(scene, options);
 
-
-
-    var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 1), scene);
-    light1.intensity = 1;
-    light1.specular = new BABYLON.Color3(0,0,0);
     camera = new BABYLON.UniversalCamera("FreeCamera", new BABYLON.Vector3(0,12,0), scene);
     camera.speed = 4;
     camera.inertia = 0.7;
@@ -114,58 +91,6 @@
 
     invisMat = new BABYLON.StandardMaterial("invisMat", scene);
     invisMat.alpha = 0;
-
-    // var gl = new BABYLON.GlowLayer("glow", scene);
-    // gl.intensity = 0.5;
-    
-    
-    // whiteMat.specularColor = new BABYLON.Color3.White();
-
-    
-
-    // var ground = new BABYLON.MeshBuilder.CreateGround("ground", {width: 500, height: 500}, scene);
-    // ground.checkCollisions = true;
-    // ground.material = redMat
-
-
-    // galleryMesh = BABYLON.SceneLoader.ImportMesh("", "models/", "MindMapTwo.glb", scene, function(meshes){
-
-    //     meshes.forEach(function(item){
-
-    //                 item.renderOutline = true;
-    //                 item.outlineWidth = 0.25;
-    //                 item.outlineColor = BABYLON.Color3.Black();       
-    //                 item.material = whiteMat;         
-
-    //                 item.doNotSyncBoundingInfo = true;
-    //                 item.alwaysSelectAsActiveMesh = true
-    //                 item.checkCollisions = true;
-    //             if(item.name.includes("Ramp") || item.name.includes("Barrier")){
-    //                 item.material = invisMat;
-    //             }else if(item.name.includes("Slope") || item.name.includes("DoorFrame")){
-    //                 item.checkCollisions = false;
-    //             } else if (item.name.includes("Coob")) {
-    //                 pickable.push(item.name);
-    //                 item.scaling.x = Math.abs(item.scaling.x)
-    //                 item.scaling.y = Math.abs(item.scaling.y)
-    //                 item.scaling.z = Math.abs(item.scaling.z)
-    //                 item.position = new BABYLON.Vector3(0,0,0)
-    //             } else if (item.name.includes("Noose")) {
-    //                 item.checkCollisions = false;
-    //             } else if (item.name.includes("MazeWalls") || item.name.includes("DoorBlock")) {
-    //                 item.material = invisMat;
-    //             } 
-                
-    //             if (item.name.includes("Isolated")) {
-    //                 item.material = redMat;
-    //             }
-            
-
-            
-
-    //     })
-
-    // });
 
     var left2load = setInterval(function(){
         document.getElementById("loadingText").innerHTML = "Items left " + scene.getWaitingItemsCount()
@@ -361,7 +286,7 @@
 
     engine.runRenderLoop(function(){
         if(readyToRender){
-            fpsText.text = engine.getFps().toFixed() + " fps";
+            // fpsText.text = engine.getFps().toFixed() + " fps";
 
             // var frustumPlanes = BABYLON.Frustum.GetPlanes(camera.getTransformationMatrix());
         
@@ -485,7 +410,7 @@
 
         var mazeGroundSize = Math.floor(text[0].length/4) * wallWidth
         var mazeGround = new BABYLON.MeshBuilder.CreateGround("MazeGround", {height: mazeGroundSize, width: mazeGroundSize}, scene)
-        mazeGround.material = whiteMat;
+        mazeGround.material = blackMat;
         mazeGround.checkCollisions = true;
         mazeGround.position.x = ((Math.floor(text[0].length/4) * wallWidth) / 2) - (wallWidth/2)
         mazeGround.position.z = ((Math.floor(text[0].length/4) - 1) * wallWidth) / 2
@@ -495,11 +420,17 @@
         endGround.checkCollisions = true;
         endGround.position.x = Math.floor(text[0].length/4) * wallWidth
         endGround.position.z = (Math.floor(text[0].length/4) - 1) * wallWidth
+
+        var endGoal = new BABYLON.MeshBuilder.CreateBox("EndGoal", {height: wallWidth/2, width: wallWidth/2, depth: wallWidth/2})
+        endGoal.material = redMat;
+        endGoal.position.x = (Math.floor(text[0].length/4) * wallWidth) - wallWidth;
+        endGoal.position.z = (Math.floor(text[0].length/4) - 1) * wallWidth;
+        endGoal.position.y = wallHeight/2;
     }
 
     function insertVertiWall(x, y) {
         let wall = new BABYLON.MeshBuilder.CreateBox("wall", {width: wallWidth, height: wallHeight, depth: wallThickness}, scene);
-        wall.material = whiteMat
+        wall.material = brickMat
         wall.renderOutline = true;
         wall.outlineWidth = 0.25;
         wall.outlineColor = BABYLON.Color3.Black();
@@ -509,8 +440,9 @@
     }
 
     function insertHorizWall(x, y) {
-        let wall = new BABYLON.MeshBuilder.CreateBox("wall", {width: wallThickness, height: wallHeight, depth: wallWidth}, scene);
-        wall.material = redMat
+        let wall = new BABYLON.MeshBuilder.CreateBox("wall", {width: wallWidth, height: wallHeight, depth: wallThickness}, scene);
+        wall.rotation.y = Math.PI / 2
+        wall.material = brickMat
         wall.renderOutline = true;
         wall.outlineWidth = 0.25;
         wall.outlineColor = BABYLON.Color3.Black();
@@ -521,7 +453,12 @@
 
     function buildMaze(m) {
 
-        console.log(displayMaze(m))
+        // console.log(displayMaze(m))
+
+        var miniMapString = displayMaze(m).replace(/(?:\r\n|\r|\n)/g, '<br>');
+        miniMapString = miniMapString.replace(/\s/g, '&nbsp;');
+        miniMapString = miniMapString.replace(/#/g, '&nbsp;');
+        document.getElementById("mapText").innerHTML = miniMapString
 
         return m
     
