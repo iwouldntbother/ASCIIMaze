@@ -82,7 +82,7 @@
     camera.minZ = 0.01;
     
     var postProcess = new BABYLON.AsciiArtPostProcess("AsciiArt", camera, {
-        font: "0.75vw Monospace",
+        font: "0.5vw Monospace",
         characterSet: " -+@/'#"
     });
 
