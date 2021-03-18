@@ -15,16 +15,11 @@
     <div id="menu">
 
         <div id="container">
-            <h1 id="title">MindMap</h1>
-            <h2 id="name">This experience covers very real and intense topics.</h2>
+            <h1 id="title"></h1>
+            <h2 id="name"></h2>
             
             
-            <p id="about">  
-                <b>Controls</b><br>
-            Use <b>WASD</b> to move and the <b>MOUSE</b> to look around<br>
-            If you get stuck hit <b>R</b> to return back to the start<br>
-            <br>
-            Pressing <b>ESC</b> will pause the experience as well as give the cursor back.
+            <p id="about"></p>
         </div>
     </div>
 
@@ -48,8 +43,7 @@
 
     <div id="loadingScreen">
         <div id="loadingHolder">
-            <img src="images/loading.gif">
-            <p id="loadingText">Loading</p>
+            <h1 id="loadingTitle">
         </div>
         
     </div>
@@ -57,7 +51,7 @@
     
     <canvas id="mainCanvas"></canvas>
     
-    <div id="miniMapContainer">
+    <div id="miniMapContainer" style="display:none;">
         <div id="miniMap">
             <p id="mapText"></p>
             <p id="copyright">© 2021, WWSTWD Studio. All rights reserved</p>
@@ -70,9 +64,9 @@
 
     <script type="text/javascript" src="js/jquery-3.4.1.js"></script>
     <script type="text/javascript" src="js/babylon.js"></script>
-    <script type="text/javascript" src="js/babylonjs.loaders.min.js"></script>
     <script type="text/javascript" src="js/babylon.gui.min.js"></script>
     <script type="text/javascript" src="js/babylon.asciiArtPostProcess.js"></script>
+    <script type="text/javascript" src="js/textData.js"></script>
     <script type="text/javascript" src="js/script.js"></script>
 
 </body>

@@ -11,6 +11,11 @@
     var camera;
     engine.enableOfflineSupport = false;
 
+    const urlQuery = window.location.search;
+    const urlParams = new URLSearchParams(urlQuery);
+
+    const size = Number(urlParams.get("size")) || 20;
+
 
     // Mesh Loading Variables //
 
@@ -82,7 +87,6 @@
     });
 
     scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
-    scene.shadowsEnabled = true;
     camera.applyGravity = true;
     camera.ellipsoid = new BABYLON.Vector3(0.5,6,0.5);
     scene.collisionsEnabled = true;
@@ -92,12 +96,13 @@
     invisMat = new BABYLON.StandardMaterial("invisMat", scene);
     invisMat.alpha = 0;
 
-    var left2load = setInterval(function(){
-        document.getElementById("loadingText").innerHTML = "Items left " + scene.getWaitingItemsCount()
-        if(scene.getWaitingItemsCount() === 0){
-            clearInterval(left2load)
-        }
-    },500)
+    var cameraCollider = new BABYLON.MeshBuilder.CreateBox("CameraCollider", {
+        height: camera.ellipsoid.y * 2,
+        width: 2,
+        depth: 2
+    }, scene)
+
+    cameraCollider.visibility = 0;
 
 
 
@@ -139,7 +144,6 @@
     document.addEventListener("mozpointerlockchange", pointerlockchange, false);
     document.addEventListener("webkitpointerlockchange", pointerlockchange, false);
 
-    crouching = false;
 
     document.addEventListener("keydown", function(evnt){
         if(isLocked){
@@ -153,17 +157,6 @@
             if(evnt.code === "ShiftLeft"){
                 camera.speed = 8;
             }
-
-            if(evnt.code === "KeyF" && !crouching){
-                camera.ellipsoid = new BABYLON.Vector3(0.25,2.5,0.25);
-                crouching = true;
-                scene.getMeshByName("DoorBlock").checkCollisions = false;
-            } else if (evnt.code === "KeyF" && crouching) {
-                crouching = false;
-                camera.position.y += 4;
-                camera.ellipsoid = new BABYLON.Vector3(0.25,5,0.25);
-                scene.getMeshByName("DoorBlock").checkCollisions = true;
-            }
             
         }
     });
@@ -176,75 +169,19 @@
         }
     });
 
-
-
-    window.addEventListener("click", function (e) {
-        if(isLocked){
-            var pickResult = scene.pick(window.innerWidth/2, window.innerHeight/2);
-
-            if (e.which == 3 && pickResult.hit && pickable.includes(pickResult.pickedMesh.name) && !pickedUp) {
-                console.log("Picked!")
-                pickedUp = pickResult.pickedMesh;
-                pickedUpCameraDiff = camera.position.subtract(pickedUp.position);
-            } else if (e.which == 3 && pickResult.hit && pickable.includes(pickResult.pickedMesh.name)) {
-                console.log("Dropped!")
-                pickedUp = null;
-                pickedUpCameraDiff = new BABYLON.Vector3();
-            }
-
-        }
-
-    });
-
-
-    var distFromCam = 8;
     
     scene.registerBeforeRender(function(){
-        // translateTransform = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(xAddPos/3000, 0, yAddPos/3000), BABYLON.Matrix.RotationY(camera.rotation.y));
-        // camera.cameraDirection.addInPlace(translateTransform);
-        // camera.cameraRotation.y += xAddRot/15000*-1;
-        // camera.cameraRotation.x += yAddRot/15000*-1;
+        
+        cameraCollider.position = camera.position.clone();
 
-        if (pickedUp) {
-
-            var cameraQuaternion = camera.rotationQuaternion.clone();
-            var directionVector = new BABYLON.Vector3(0,0,distFromCam);
-            var rotationVector = multiplyQuaternionByVector(cameraQuaternion, directionVector);
-
-            pickedUp.position.set(-(camera.position.x + rotationVector.x), camera.position.y + rotationVector.y, camera.position.z + rotationVector.z);
-
+        if (camera.position.y < -200) {
+            camera.position = new BABYLON.Vector3(0,10,0);
+                camera.setTarget = new BABYLON.Vector3(0,10,0);
+                camera.rotation.x = 0;
+                camera.rotation.y = 7;
         }
         
-
     }); 
-
-
-    function multiplyQuaternionByVector(quaternion, vector){
-        var target = new BABYLON.Vector3();
-
-        var x = vector.x,
-            y = vector.y,
-            z = vector.z;
-    
-        var qx = quaternion.x,
-            qy = quaternion.y,
-            qz = quaternion.z,
-            qw = quaternion.w;
-    
-        // q*v
-        var ix =  qw * x + qy * z - qz * y,
-        iy =  qw * y + qz * x - qx * z,
-        iz =  qw * z + qx * y - qy * x,
-        iw = -qx * x - qy * y - qz * z;
-    
-        target.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
-        target.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
-        target.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
-    
-        return target;
-
-
-    };
 
     scene.executeWhenReady(function(){
         document.getElementById("loadingScreen").style.display = "none";
@@ -267,7 +204,7 @@
     scene.autoClearDepthAndStencil = false;
     scene.blockMaterialDirtyMechanism = true;
 
-
+    
 
     return scene;
     };
@@ -300,16 +237,22 @@
         engine.resize();
     });
 
+    var gameEnd = false;
 
     function loadPauseMenu() {
         var title = document.getElementById("title");
         var name = document.getElementById("name");
         var about = document.getElementById("about");
 
-
-        title.innerHTML = "Paused.";
-        name.innerHTML = "This experience covers very real and intense topics.";
-        about.innerHTML = "Please close this tab if you are at all uncomfortable.";
+        if (gameEnd) {
+            title.innerHTML = textData["gameOver"].replace(/\s/g, '&nbsp;');
+            name.innerHTML = "Congratulations on reaching the end!"
+            about.innerHTML = "Refresh the page for a new maze"
+        } else {
+            name.innerHTML = "Paused.";
+            title.innerHTML = textData["title"].replace(/\s/g, '&nbsp;');
+            about.innerHTML = textData["intro"];
+        }
     }
 
 
@@ -319,9 +262,11 @@
     let wallThickness = 2;
     let wallWidth = 20;
     var grid = [];
+    var wallMeshes= [];
 
     function maze(x,y) {
         var n=x*y-1;
+        // console.log(n)
         if (n<0) {alert("illegal maze dimensions");return;}
         var horiz =[]; for (var j= 0; j<x+1; j++) horiz[j]= [],
             verti =[]; for (var j= 0; j<x+1; j++) verti[j]= [],
@@ -408,6 +353,8 @@
             }
         }
 
+        // MAZE GROUND //
+
         var mazeGroundSize = Math.floor(text[0].length/4) * wallWidth
         var mazeGround = new BABYLON.MeshBuilder.CreateGround("MazeGround", {height: mazeGroundSize, width: mazeGroundSize}, scene)
         mazeGround.material = blackMat;
@@ -415,21 +362,47 @@
         mazeGround.position.x = ((Math.floor(text[0].length/4) * wallWidth) / 2) - (wallWidth/2)
         mazeGround.position.z = ((Math.floor(text[0].length/4) - 1) * wallWidth) / 2
 
-        var endGround = new BABYLON.MeshBuilder.CreateGround("EndGround", {height: wallWidth, width: wallWidth}, scene)
-        endGround.material = redMat;
-        endGround.checkCollisions = true;
-        endGround.position.x = Math.floor(text[0].length/4) * wallWidth
-        endGround.position.z = (Math.floor(text[0].length/4) - 1) * wallWidth
+        // END GROUND //
 
-        var endGoal = new BABYLON.MeshBuilder.CreateBox("EndGoal", {height: wallWidth/2, width: wallWidth/2, depth: wallWidth/2})
+        // var endGround = new BABYLON.MeshBuilder.CreateGround("EndGround", {height: wallWidth, width: wallWidth}, scene)
+        // endGround.material = redMat;
+        // endGround.checkCollisions = true;
+        // endGround.position.x = Math.floor(text[0].length/4) * wallWidth
+        // endGround.position.z = (Math.floor(text[0].length/4) - 1) * wallWidth
+
+        // END GOAL //
+
+        var endGoal = new BABYLON.MeshBuilder.CreateBox("EndGoal", {height: wallHeight/2, width: wallWidth/2, depth: wallWidth/2}, scene)
         endGoal.material = redMat;
         endGoal.position.x = (Math.floor(text[0].length/4) * wallWidth) - wallWidth;
         endGoal.position.z = (Math.floor(text[0].length/4) - 1) * wallWidth;
-        endGoal.position.y = wallHeight/2;
+        endGoal.position.y = wallHeight/4;
+
+        // COLLISION TRIGGER //
+
+        scene.getMeshByName("CameraCollider").actionManager = new BABYLON.ActionManager(scene);
+        scene.getMeshByName("CameraCollider").actionManager.registerAction(
+            new BABYLON.ExecuteCodeAction(
+                {
+                    trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
+                    parameter: endGoal
+                },
+                function () {
+                    console.log("Game Over");
+                    loadMenu("gameOver")
+                }
+            )
+        )
+
+        var mazeMeshes = new BABYLON.Mesh.MergeMeshes(wallMeshes);
     }
 
     function insertVertiWall(x, y) {
-        let wall = new BABYLON.MeshBuilder.CreateBox("wall", {width: wallWidth, height: wallHeight, depth: wallThickness}, scene);
+        let wall = new BABYLON.MeshBuilder.CreateBox("wall", {
+            width: wallWidth, 
+            height: wallHeight, 
+            depth: wallThickness
+        }, scene);
         wall.material = brickMat
         wall.renderOutline = true;
         wall.outlineWidth = 0.25;
@@ -437,10 +410,16 @@
         wall.position.x = x
         wall.position.z = y - (wallWidth/2)
         wall.checkCollisions = true;
+
+        wallMeshes.push(wall);
     }
 
     function insertHorizWall(x, y) {
-        let wall = new BABYLON.MeshBuilder.CreateBox("wall", {width: wallWidth, height: wallHeight, depth: wallThickness}, scene);
+        let wall = new BABYLON.MeshBuilder.CreateBox("wall", {
+            width: wallWidth, 
+            height: wallHeight, 
+            depth: wallThickness
+        }, scene);
         wall.rotation.y = Math.PI / 2
         wall.material = brickMat
         wall.renderOutline = true;
@@ -449,6 +428,8 @@
         wall.position.x = x - (wallWidth/2)
         wall.position.z = y - (wallWidth/2)
         wall.checkCollisions = true;
+
+        wallMeshes.push(wall);
     }
 
     function buildMaze(m) {
@@ -460,8 +441,34 @@
         miniMapString = miniMapString.replace(/#/g, '&nbsp;');
         document.getElementById("mapText").innerHTML = miniMapString
 
+        // console.log(m)
+
         return m
     
     }
 
-    buildMaze(maze(10,10))
+
+    
+
+    console.log("Building maze of size: "+size)
+    buildMaze(maze(size,size))
+
+    function loadMenu(type) {
+        const title = document.getElementById("title")
+        const name = document.getElementById("name")
+        const about = document.getElementById("about")
+        const loadingTitle = document.getElementById("loadingTitle")
+        if (type == "intro") {
+            title.innerHTML = textData["title"].replace(/\s/g, '&nbsp;');
+            name.innerHTML = "By Will Westwood"
+            loadingTitle.innerHTML = textData["title"].replace(/\s/g, '&nbsp;');
+            about.innerHTML = textData["intro"]
+        } else if (type == "gameOver") {
+            gameEnd = true;
+            document.exitPointerLock()
+            // camera.detachControl(canvas);
+            // document.getElementById("menu").style.display = "flex";
+        }
+    }
+
+    loadMenu("intro")
