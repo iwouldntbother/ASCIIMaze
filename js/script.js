@@ -472,3 +472,38 @@
     }
 
     loadMenu("intro")
+
+    function randomHintGen() {
+        if (hints.length > 0) {
+            var hint = hints[Math.floor(Math.random() * (hints.length-1))]
+            hints.splice(hints.indexOf(hint), 1);
+            console.log(hint)
+            return hint;
+        } else {
+            return "Nothing can help you now...";
+        }
+    }
+    
+    function showHint(hint) {
+        document.getElementById("hintsText").innerHTML = hint;
+        showHintBar();
+    }
+
+    var hintsPopupShown = false
+
+    function showHintBar() {
+        var hintsPopup = document.getElementById("hintsPopup")
+        if (!hintsPopupShown) {
+            hintsPopup.style.opacity = 1
+            hintsPopupShown = true
+            setTimeout(() => {
+                hintsPopup.style.opacity = 0
+                hintsPopupShown = false
+            }, 30000)
+        }
+    }
+
+    var hintLoop = setInterval(() => {
+        showHint(randomHintGen())
+    }, 120000)
+    

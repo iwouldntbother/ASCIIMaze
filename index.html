@@ -39,29 +39,38 @@
         <h4 id="helpText">Click anywhere to start</h4>
     </div>
 
+    
     <!-- // Loading Sceen //-->
-
+    
     <div id="loadingScreen">
         <div id="loadingHolder">
             <h1 id="loadingTitle">
+            </div>
+            
         </div>
         
-    </div>
-
-    
-    <canvas id="mainCanvas"></canvas>
-    
-    <div id="miniMapContainer" style="display:none;">
-        <div id="miniMap">
-            <p id="mapText"></p>
-            <p id="copyright">© 2021, WWSTWD Studio. All rights reserved</p>
+        
+        <canvas id="mainCanvas"></canvas>
+        
+        <div id="miniMapContainer" style="display:none;">
+            <div id="miniMap">
+                <p id="mapText"></p>
+                <p id="copyright">© 2021, WWSTWD Studio. All rights reserved</p>
+            </div>
         </div>
-    </div>
-    
-    <div id="cursorContainer">
-        <img id="cursor" src="images/cursor.svg">
-    </div>
-
+        
+        <div id="cursorContainer">
+            <img id="cursor" src="images/cursor.svg">
+        </div>
+        
+        <div id="hintsHolder">
+            
+            <div id="hintsPopup">
+                <h1 id="hintsText">Test hint.</h1>
+            </div>
+            
+        </div>
+        
     <script type="text/javascript" src="js/jquery-3.4.1.js"></script>
     <script type="text/javascript" src="js/babylon.js"></script>
     <script type="text/javascript" src="js/babylon.gui.min.js"></script>
