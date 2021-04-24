@@ -499,11 +499,11 @@
             setTimeout(() => {
                 hintsPopup.style.opacity = 0
                 hintsPopupShown = false
-            }, 30000)
+            }, 5000)
         }
     }
 
     var hintLoop = setInterval(() => {
         showHint(randomHintGen())
-    }, 120000)
+    }, 30000)
     
