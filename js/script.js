@@ -45,8 +45,8 @@
     var whiteMat = new BABYLON.StandardMaterial("whiteMat", scene)
     whiteMat.emissiveColor = new BABYLON.Color3.White();
 
-    var redMat = new BABYLON.StandardMaterial("redMat", scene)
-    redMat.emissiveColor = new BABYLON.Color3.Red();
+    var greenMat = new BABYLON.StandardMaterial("greenMat", scene)
+    greenMat.emissiveColor = new BABYLON.Color3.Green();
 
     var blackMat = new BABYLON.StandardMaterial("blackMat", scene)
     blackMat.emissiveColor = new BABYLON.Color3.Black();
@@ -373,7 +373,7 @@
         // END GOAL //
 
         var endGoal = new BABYLON.MeshBuilder.CreateBox("EndGoal", {height: wallHeight/2, width: wallWidth/2, depth: wallWidth/2}, scene)
-        endGoal.material = redMat;
+        endGoal.material = greenMat;
         endGoal.position.x = (Math.floor(text[0].length/4) * wallWidth) - wallWidth;
         endGoal.position.z = (Math.floor(text[0].length/4) - 1) * wallWidth;
         endGoal.position.y = wallHeight/4;
